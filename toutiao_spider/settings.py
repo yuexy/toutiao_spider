@@ -13,7 +13,9 @@ BOT_NAME = 'toutiao_spider'
 
 SPIDER_MODULES = ['toutiao_spider.spiders']
 NEWSPIDER_MODULE = 'toutiao_spider.spiders'
-
+ITEM_PIPELINES = {'scrapy.contrib.pipeline.images.ImagesPipeline': 1}
+IMAGES_STORE ='/home/yuexy/spiders/toutiao_spider/images_bg/'
+IMAGES_EXPIRES = 30
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 #USER_AGENT = 'toutiao_spider (+http://www.yourdomain.com)'
