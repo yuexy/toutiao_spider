@@ -1,7 +1,10 @@
 #coding:utf-8	
 import scrapy
 from toutiao_spider.items import ToutiaoSpiderItem
-site="http://www.tooopen.com"
+import requests
+import json
+import urllib
+import os
 
 class ToutiaoSpider(scrapy.Spider):
 	name = "toutiao"
@@ -17,24 +20,34 @@ class ToutiaoSpider(scrapy.Spider):
 #请求每一个分类,按页数来
 	def parse(self,response):
 		for ctg in self.category:
-			for page in range(0,self.maxpage):
+			for page in range(1,self.maxpage):
 				url = self.base_url+'/'+ctg+'/p'+str(page)
 				yield scrapy.Request(url,self.parseNewsHref)
 
 #解析每页新闻列表的地址
 	def parseNewsHref(self,response):
 		urls = response.xpath("//div[@class='info']//a/@href").extract()
+		# print urls
 		for url in urls:
-			news_url = self.base_url+url
-			yield scrapy.Request(news_url,self.parseNews)
+			if url.find('group') > 0:
+				news_url = self.base_url+url
+				yield scrapy.Request(news_url,self.parseNews)
 
-#解析具体新闻内容 
+# #解析具体新闻内容 
 	def parseNews(self,response):
-		image_urls = resonse.xpath("//div[@class='img-wrap']/@data-src").extract()
-		for image_url in image_urls:
-			item = ToutiaoSpiderItem()
-			item['image_urls'] = image_url
-			yield item
+		image_urls = response.xpath("//div[@class='img-wrap']/@data-src").extract()
+		print image_urls
+		for url in image_urls:
+			print url
+			img = urllib.urlopen(url).read()
+			file_name = url.split('/')[-1] + '.jpg'
+			file_path = '/home/yuexy/spiders/toutiao_spider/images/' + file_name
+			f = file(file_path, 'wb')
+			f.write(img)
+			f.close()
+			# item['image_urls']=url
+			# yield item
+
 
 		# articles = response.xpath("//div[@id='pagelet-article']")
 		# item = NewsSpiderItem()
