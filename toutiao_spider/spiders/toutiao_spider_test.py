@@ -8,6 +8,7 @@ import os
 
 class ToutiaoSpider(scrapy.Spider):
 	name = "toutiao"
+	index = 0
 	allowed_domains = ["toutiao.com"]
 	start_urls = [
 	'http://toutiao.com/articles_news_photography/p1'
@@ -29,9 +30,8 @@ class ToutiaoSpider(scrapy.Spider):
 		urls = response.xpath("//div[@class='info']//a/@href").extract()
 		# print urls
 		for url in urls:
-			if url.find('group') > 0:
-				news_url = self.base_url+url
-				yield scrapy.Request(news_url,self.parseNews)
+			news_url = self.base_url+url
+			yield scrapy.Request(news_url,self.parseNews)
 
 # #解析具体新闻内容 
 	def parseNews(self,response):
@@ -40,11 +40,13 @@ class ToutiaoSpider(scrapy.Spider):
 		for url in image_urls:
 			print url
 			img = urllib.urlopen(url).read()
-			file_name = url.split('/')[-1] + '.jpg'
-			file_path = '/home/yuexy/spiders/toutiao_spider/images/' + file_name
+			file_name = str(self.index) + '.jpg'#url.split('/')[-1] + '.jpg'
+			self.index += 1
+			file_path = '/home/yuexy/code/spider/images/' + file_name
 			f = file(file_path, 'wb')
 			f.write(img)
 			f.close()
+			# item = ToutiaoSpiderItem()
 			# item['image_urls']=url
 			# yield item
 
